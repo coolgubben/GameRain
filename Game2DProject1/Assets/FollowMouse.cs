@@ -13,6 +13,15 @@ public class FollowMouse : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (Player.FindChild ("2D Character")) {
+				
+						Debug.Log ("found");
+		
+				} 
+		else {
+			Debug.Log ("not found");
+		}
+
 		Vector3 objpos = Player.position; //Object position on screen
 
 		Vector2 relobjpos = new Vector2(objpos.x,objpos.y);
