@@ -11,10 +11,14 @@ public class PlatformerCharacter2D : MonoBehaviour
 	[SerializeField] float crouchSpeed = .36f;			// Amount of maxSpeed applied to crouching movement. 1 = 100%
 	
 	[SerializeField] bool airControl = false;			// Whether or not a player can steer while jumping;
-	[SerializeField] LayerMask whatIsGround;			// A mask determining what is ground to the character
+	[SerializeField] LayerMask whatIsGround;
+
+	float curSpeed = 0f;
+
+	// A mask determining what is ground to the character
 	
 	Transform groundCheck;								// A position marking where to check if the player is grounded.
-	float groundedRadius = .2f;							// Radius of the overlap circle to determine if grounded
+	float groundedRadius = 1f;	//1.6		//0.2f		// Radius of the overlap circle to determine if grounded
 	bool grounded = false;								// Whether or not the player is grounded.
 	Transform ceilingCheck;								// A position marking where to check for ceilings
 	float ceilingRadius = .01f;							// Radius of the overlap circle to determine if the player can stand up
@@ -37,7 +41,7 @@ public class PlatformerCharacter2D : MonoBehaviour
 		anim.SetBool("Ground", grounded);
 
 		// Set the vertical animation
-		anim.SetFloat("vSpeed", rigidbody2D.velocity.y);
+		anim.SetFloat("vSpeed", GetComponent<Rigidbody2D>().velocity.y);
 	}
 
 
@@ -56,6 +60,63 @@ public class PlatformerCharacter2D : MonoBehaviour
 		// Set whether or not the character is crouching in the animator
 		anim.SetBool("Crouch", crouch);
 
+		if (!Input.GetKey ("a") && !Input.GetKey ("d")) {
+			if (grounded && curSpeed < 0){
+				curSpeed = curSpeed + 1f;
+			}
+			if (grounded && curSpeed > 0){
+				curSpeed = curSpeed - 1f;
+			}
+			if (!grounded && curSpeed < 0){
+				curSpeed = curSpeed + 0.2f;
+			}
+			if (!grounded && curSpeed > 0){
+				curSpeed = curSpeed - 0.2f;
+			}
+			if (curSpeed > -1 && curSpeed < 1){
+				curSpeed = 0;
+			}
+		}
+		
+		else if (Input.GetKey ("a")) {
+			if(grounded) {
+				curSpeed = curSpeed - 3f;
+			}
+			else{
+				curSpeed = curSpeed - 0.3f;
+			}
+		}
+		
+		else if (Input.GetKey ("d")) {
+			if(grounded) {
+				curSpeed = curSpeed + 3f;
+			}
+			else{
+				curSpeed = curSpeed + 0.3f;
+			}
+		}
+		if (curSpeed < -maxSpeed) {
+			curSpeed = -maxSpeed;
+		}
+		if (curSpeed > maxSpeed) {
+			curSpeed = maxSpeed;
+		}
+
+
+		if(!grounded)
+		{
+			// Tweaka öppna paraplyets fall speed här                         v        v
+			if (Input.GetButton("Fire1") && GetComponent<Rigidbody2D>().velocity.y < -1000f){
+				if (transform.rotation.w < -105 || transform.rotation.z < -105) {
+					
+					GetComponent<Rigidbody2D>().velocity = new Vector2(curSpeed, -2f);
+					
+				}
+			}
+			GetComponent<Rigidbody2D>().velocity = new Vector2(curSpeed, GetComponent<Rigidbody2D>().velocity.y);
+			
+		}
+
 		//only control the player if grounded or airControl is turned on
 		if(grounded || airControl)
 		{
@@ -66,7 +127,7 @@ public class PlatformerCharacter2D : MonoBehaviour
 			anim.SetFloat("Speed", Mathf.Abs(move));
 
 			// Move the character
-			rigidbody2D.velocity = new Vector2(move * maxSpeed, rigidbody2D.velocity.y);
+			GetComponent<Rigidbody2D>().velocity = new Vector2(move * maxSpeed, GetComponent<Rigidbody2D>().velocity.y);
 			
 			// If the input is moving the player right and the player is facing left...
 			if(move > 0 && !facingRight)
@@ -82,7 +143,7 @@ public class PlatformerCharacter2D : MonoBehaviour
         if (grounded && jump) {
             // Add a vertical force to the player.
             anim.SetBool("Ground", false);
-            rigidbody2D.AddForce(new Vector2(0f, jumpForce));
+            GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, jumpForce));
         }
 	}
 

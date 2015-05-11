@@ -17,6 +17,8 @@ public class LookAtMouse : MonoBehaviour{
 	quat.eulerAngles = new Vector3(0,0,angle - 90); //Changing angle
 	transform.rotation = quat;
 
+		//Debug.Log ("rotation: " + transform.rotation);
+		//Debug.Log ("rotation w: " + transform.rotation.w);
 	
 }
 }
